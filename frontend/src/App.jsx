@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { ethers } from 'ethers';
+import * as ethers from 'zksync-web3';
 
 function App() {
   const [account, setAccount] = useState(null);
   const [poapNftId, setPoapNftId] = useState('');
-  const [tutorialName, setTutorialName] = useState('');
+  const [tutorialName, setTutorialName] = useState('Tutorial 1');  // Set default value to 'Tutorial 1'
   const [deployedTestnetAddress, setDeployedTestnetAddress] = useState('');
 
   const connectMetamask = async () => {
@@ -22,11 +22,17 @@ function App() {
       return;
     }
 
-    const CONTRACT_ADDRESS = 'YOUR_ZKSYNC_TESTNET_ADDRESS_HERE';  // TODO: input deployed contract testnet address
+    if (deployedTestnetAddress.length !== 42 || !deployedTestnetAddress.startsWith('0x')) {
+      alert('Please input a valid testnet address.');
+      return;
+    }
+
+    const CONTRACT_ADDRESS = '0x7220a5759FE3AB031632C718bF51D735820889Ee';  // Version of 2023-08-18
     const ABI = [
       {
         "name": "submitTutorial",
         "type": "function",
+        "stateMutability": "nonpayable",
         "inputs": [
           { "name": "poapNftId", "type": "uint256" },
           { "name": "deployedTestnetAddress", "type": "string" },
@@ -36,7 +42,7 @@ function App() {
       }
     ];
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.Web3Provider(window.ethereum);
     const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider.getSigner());
     await contract.submitTutorial(poapNftId, deployedTestnetAddress, tutorialName);
   };
@@ -61,13 +67,11 @@ function App() {
           </select>
           <input
             type="text"
-            placeholder="Deployed Contract Testnet Address"
+            placeholder="Paste your Testnet Address"
             value={deployedTestnetAddress}
             onChange={(e) => {
               const value = e.target.value;
-              if (value.startsWith('0x') && value.length === 42) {
-                setDeployedTestnetAddress(value);
-              }
+              setDeployedTestnetAddress(value);
             }}
           />
           <button onClick={submitTutorial}>Submit</button>

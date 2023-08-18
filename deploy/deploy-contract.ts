@@ -26,7 +26,6 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const artifact = await deployer.loadArtifact(CONTRACT_NAME);
 
   // Estimate contract deployment fee
-  const greeting = "Hi there!";
   const deploymentFee = await deployer.estimateDeployFee(artifact, []);
 
   // Deploy this contract. The returned object will be of a `Contract` type, similarly to ones in `ethers`.
