@@ -74,6 +74,22 @@ describe("TutorialSubmission", function () {
       expect(error.message).to.include("execution reverted: Not authorized to call this function");
     }
   });
+
+  it("Should fail when user tries to add a submission with the same poapNftId and tutorialName", async function () {
+    const submission = {
+      poapNftId: 1,
+      deployedTestnetAddress: "0x0000000000",
+      tutorialName: "Tutorial 1",
+    };
+    const userTutorialContract = new Contract(tutorialContract.address, tutorialContract.interface, userWallet);
+    try {
+      const addSubmissionTx = await userTutorialContract.submitTutorial(submission.poapNftId, submission.deployedTestnetAddress, submission.tutorialName);
+      await addSubmissionTx.wait();
+      expect.fail("Expected submitTutorial to revert, but it didn't");
+    } catch (error) {
+      expect(error.message).to.include("execution reverted: Tutorial already submitted");
+    }
+  });
 });
 
 function convertToSubmissionObject(arr: any[]): any {
