@@ -2,7 +2,7 @@
   "name": "zksync-hardhat-template",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "Antonio <aug@matterlabs.dev>",
+  "author": "idea404",
   "license": "MIT",
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.3",
