@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import * as ethers from 'zksync-web3';
 
+const CONTRACT_ADDRESS = '0x7220a5759FE3AB031632C718bF51D735820889Ee';  // Version of 2023-08-18
+
 function App() {
   const [account, setAccount] = useState(null);
   const [poapNftId, setPoapNftId] = useState('');
@@ -27,7 +29,6 @@ function App() {
       return;
     }
 
-    const CONTRACT_ADDRESS = '0x7220a5759FE3AB031632C718bF51D735820889Ee';  // Version of 2023-08-18
     const ABI = [
       {
         "name": "submitTutorial",
