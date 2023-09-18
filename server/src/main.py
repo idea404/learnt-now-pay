@@ -2,7 +2,8 @@ import json
 from pathlib import Path
 
 from eth_typing import ChecksumAddress
-from eth_account.signers.local import LocalAccount as Account
+from eth_account import Account
+from eth_account.signers.local import LocalAccount
 from web3 import Web3
 from web3.contract.contract import Contract
 from zksync2.module.module_builder import ZkSyncBuilder
@@ -12,21 +13,21 @@ def get_abi_from_standard_json(standard_json: Path):
         return json.load(json_f)["abi"]
 
 def get_contract_data(zk_web3: Web3, contract_json_path: Path, contract_address: ChecksumAddress) -> list[tuple]:
-    submissions_contract: Contract = zk_web3.eth.contract(address=contract_address, abi=get_abi_from_standard_json(contract_json_path))
+    submissions_contract: Contract = zk_web3.zksync.contract(address=contract_address, abi=get_abi_from_standard_json(contract_json_path)) # type: ignore
     result: list[tuple] = submissions_contract.functions.viewSubmissions().call({})
     return result
 
 def change_submission_state(
         zk_web3: Web3, 
-        account: Account,
+        account: LocalAccount,
         contract_json_path: Path, 
         submissions_contract_address: ChecksumAddress, 
         poap_nft_id: int, 
         tutorial_name: str, 
         new_status: str
     ):
-    submissions_contract: Contract = zk_web3.eth.contract(address=submissions_contract_address, abi=get_abi_from_standard_json(contract_json_path))
-    
+    submissions_contract: Contract = zk_web3.zksync.contract(address=submissions_contract_address, abi=get_abi_from_standard_json(contract_json_path)) # type: ignore
+
     tx = submissions_contract.functions.updateSubmissionStatus(poap_nft_id, tutorial_name, new_status).build_transaction({
         "from": account.address,
         "nonce": zk_web3.eth.get_transaction_count(account.address),
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     import os
     private_key = os.environ.get("PRIVATE_KEY")
     assert private_key is not None
-    account: Account = zk_web3.eth.account.from_key(private_key)
+    account: LocalAccount = Account.from_key(private_key)
     print(account.address)
     tx_hash = change_submission_state(zk_web3, account, contract_json_path, tutorial_submissions_contract_address, 1, "Tutorial 2",'COMPLETE')
     print(tx_hash.hex())
