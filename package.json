@@ -22,6 +22,7 @@
   },
   "scripts": {
     "test": "NODE_ENV=test hardhat test --network zkSyncTestnet",
-    "deploy": "yarn hardhat deploy-zksync --script deploy-contract.ts"
+    "deploy:submission": "yarn hardhat deploy-zksync --script deploy-submission.ts",
+    "deploy:multiplier": "yarn hardhat deploy-zksync --script deploy-multiplier.ts"
   }
 }

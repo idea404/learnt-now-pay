@@ -1,15 +1,20 @@
-import { Wallet, utils } from "zksync-web3";
-import * as ethers from "ethers";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
+import dotenv from "dotenv";
+import * as ethers from "ethers";
+import fs from "fs";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import path from "path";
+import { Wallet } from "zksync-web3";
+import { getPrivateKey } from "./utils";
 
 // load env file
-import dotenv from "dotenv";
 dotenv.config();
 
 // load wallet private key from env file
-const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY || "";
-const CONTRACT_NAME = "TutorialSubmission";
+const CONTRACT_NAME = "PoapMultiplier";
+const CONFIG_PATH = path.join(__dirname, "..", "config", "vars.json");
+const NETWORK = process.env.NODE_ENV || "test"; // Default to test if NODE_ENV is not set
+const PRIVATE_KEY = getPrivateKey(NETWORK);
 
 if (!PRIVATE_KEY)
   throw "⛔️ Private key not detected! Add it to the .env file!";
@@ -43,8 +48,22 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const contractAddress = greeterContract.address;
   console.log(`${artifact.contractName} was deployed to ${contractAddress}`);
 
+  // Save the deployed contract address to vars.json
+  const config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+
+  if (!config[NETWORK]) {
+    config[NETWORK] = { deployed: [] };
+  }
+
+  config[NETWORK].deployed.push({
+    name: CONTRACT_NAME,
+    address: contractAddress,
+  });
+
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+
   // verify contract for tesnet & mainnet
-  if (process.env.NODE_ENV != "test") {
+  if (NETWORK != "test") {
     // Contract MUST be fully qualified name (e.g. path/sourceName:contractName)
     const contractFullyQualifedName = `contracts/${CONTRACT_NAME}.sol:${CONTRACT_NAME}`;
 
