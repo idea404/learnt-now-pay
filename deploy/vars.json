@@ -1,0 +1,10 @@
+{
+  "testnet": {
+    "deployed": [
+      {
+        "name": "PoapMultiplier",
+        "address": "0xEE6050F37B19661F431Ae9B9eA1a25a79c1a7E8B"
+      }
+    ]
+  }
+}
