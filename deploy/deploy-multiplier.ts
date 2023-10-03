@@ -12,7 +12,7 @@ dotenv.config();
 
 // load wallet private key from env file
 const CONTRACT_NAME = "PoapMultiplier";
-const CONFIG_PATH = path.join(__dirname, "..", "config", "vars.json");
+const JSON_FILE_PATH = path.join(__dirname, "vars.json");
 const NETWORK = process.env.NODE_ENV || "test"; // Default to test if NODE_ENV is not set
 const PRIVATE_KEY = getPrivateKey(NETWORK);
 
@@ -49,7 +49,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   console.log(`${artifact.contractName} was deployed to ${contractAddress}`);
 
   // Save the deployed contract address to vars.json
-  const config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+  const config = JSON.parse(fs.readFileSync(JSON_FILE_PATH, "utf-8"));
 
   if (!config[NETWORK]) {
     config[NETWORK] = { deployed: [] };
@@ -60,7 +60,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     address: contractAddress,
   });
 
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+  fs.writeFileSync(JSON_FILE_PATH, JSON.stringify(config, null, 2));
 
   // verify contract for tesnet & mainnet
   if (NETWORK != "test") {

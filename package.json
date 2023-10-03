@@ -9,6 +9,7 @@
     "@matterlabs/hardhat-zksync-solc": "^0.4.0",
     "@matterlabs/hardhat-zksync-verify": "^0.1.8",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
+    "@openzeppelin/contracts": "^4.9.3",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "chai": "^4.3.7",
@@ -21,8 +22,11 @@
     "zksync-web3": "^0.14.3"
   },
   "scripts": {
-    "test": "NODE_ENV=test hardhat test --network zkSyncTestnet",
+    "node:start": "npx zksync-cli dev start",
+    "node:end": "npx zksync-cli dev stop",
+    "test": "trap 'npm run end' EXIT; npm run start && NODE_ENV=test hardhat test --network zkSyncTestnet",
     "deploy:submission": "yarn hardhat deploy-zksync --script deploy-submission.ts",
-    "deploy:multiplier": "yarn hardhat deploy-zksync --script deploy-multiplier.ts"
+    "deploy:multiplier": "yarn hardhat deploy-zksync --script deploy-multiplier.ts",
+    "deploy:poap": "yarn hardhat deploy-zksync --script deploy-poap.ts"
   }
 }
