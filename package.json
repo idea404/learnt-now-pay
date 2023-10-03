@@ -24,7 +24,7 @@
   "scripts": {
     "node:start": "npx zksync-cli dev start",
     "node:end": "npx zksync-cli dev stop",
-    "test": "trap 'npm run end' EXIT; npm run start && NODE_ENV=test hardhat test --network zkSyncTestnet",
+    "test": "trap 'npm run node:end' EXIT; npm run node:start && NODE_ENV=test hardhat test --network zkSyncTestnet",
     "deploy:submission": "yarn hardhat deploy-zksync --script deploy-submission.ts",
     "deploy:multiplier": "yarn hardhat deploy-zksync --script deploy-multiplier.ts",
     "deploy:poap": "yarn hardhat deploy-zksync --script deploy-poap.ts"
