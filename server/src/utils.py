@@ -8,7 +8,7 @@ class Status(Enum):
     PENDING = "PENDING"
     INVALID = "INVALID"
     VALID = "VALID"
-    COMPLETE = "COMPLETE"
+    PAID = "PAID"
 
 @dataclass
 class Submission:
