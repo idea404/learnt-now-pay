@@ -3,14 +3,19 @@ from utils import Submission
 from web3 import Web3
 from pathlib import Path
 from utils import get_abi_from_standard_json
+from structlog import get_logger
+
+log = get_logger(__name__)
 
 
 def test_submission(submission: Submission, zk_web3: Web3, contract_json_path: Path) -> bool:
+  log.info(f"Testing {submission}...")
   contract = zk_web3.zksync.contract(address=submission.deployed_contract_address, abi=get_abi_from_standard_json(contract_json_path)) # type: ignore
   result = contract.functions.getValue(1).call()
-  print(result)
   if result == submission.poap_nft_id:
+    log.info(f"Submission valid")
     return True
+  log.info(f"Submission invalid")
   return False
 
 
