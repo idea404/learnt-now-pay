@@ -101,3 +101,5 @@ function convertToSubmissionObject(arr: any[]): any {
     status: arr[3],
   };
 }
+
+// TODO: tests for other contracts and create NFT contract
