@@ -3,16 +3,13 @@ import * as ethers from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 import dotenv from "dotenv";
-import fs from "fs";
-import path from "path";
-import { getPrivateKey } from "./utils";
+import { getPrivateKey, saveContractToVars } from "./utils";
 
 // load env file
 dotenv.config();
 
 // load wallet private key from env file
 const CONTRACT_NAME = "TutorialSubmission";
-const JSON_FILE_PATH = path.join(__dirname, "vars.json");
 const NETWORK = process.env.NODE_ENV || "test"; // Default to test if NODE_ENV is not set
 const PRIVATE_KEY = getPrivateKey(NETWORK);
 
@@ -49,18 +46,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   console.log(`${artifact.contractName} was deployed to ${contractAddress}`);
 
   // Save the deployed contract address to vars.json
-  const config = JSON.parse(fs.readFileSync(JSON_FILE_PATH, "utf-8"));
-
-  if (!config[NETWORK]) {
-    config[NETWORK] = { deployed: [] };
-  }
-
-  config[NETWORK].deployed.push({
-    name: CONTRACT_NAME,
-    address: contractAddress,
-  });
-
-  fs.writeFileSync(JSON_FILE_PATH, JSON.stringify(config, null, 2));
+  saveContractToVars(NETWORK, CONTRACT_NAME, contractAddress);
 
   // verify contract for tesnet & mainnet
   if (NETWORK != "test") {
