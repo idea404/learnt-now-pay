@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { Wallet, Provider, Contract } from "zksync-web3";
 import * as hre from "hardhat";
+import * as ethers from "ethers";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 import { zkSyncTestnet } from "../hardhat.config";
 
@@ -102,4 +103,96 @@ function convertToSubmissionObject(arr: any[]): any {
   };
 }
 
-// TODO: tests for other contracts and create NFT contract
+describe("Payout", function () {
+  let payoutContract: Contract;
+  let poapNFTContract: Contract;
+  let ownerWallet: Wallet;
+  let userWallet: Wallet;
+
+  before(async function () {
+    // deploy the Payout contract
+    const provider = new Provider(zkSyncTestnet.url);
+    ownerWallet = new Wallet(RICH_WALLET_PK_1, provider);
+    userWallet = new Wallet(RICH_WALLET_PK_2, provider);
+    const deployer = new Deployer(hre, ownerWallet);
+
+    // Deploy the PoapNFT contract first
+    const poapNFTArtifact = await deployer.loadArtifact("PoapNFT");
+    poapNFTContract = await deployer.deploy(poapNFTArtifact, []);
+
+    // Deploy the Payout contract and pass the address of the PoapNFT contract
+    const payoutArtifact = await deployer.loadArtifact("Payout");
+    payoutContract = await deployer.deploy(payoutArtifact, [poapNFTContract.address]);
+
+    // Mint a POAP NFT for the user
+    const mintTx = await poapNFTContract.mint(userWallet.address);
+    await mintTx.wait();
+
+    // Transfer 1 ETH to payout contract
+    console.log("Transferring 1 ETH to payout contract");
+    const transferTx = await ownerWallet.sendTransaction({
+      to: payoutContract.address,
+      value: ethers.utils.parseEther("1"),
+    });
+    await transferTx.wait();
+    console.log("1 ETH transferred to payout contract");
+  });
+
+  it("Should add a new tutorial category", async function () {
+    const newCategory = "New Tutorial";
+    const addCategoryTx = await payoutContract.addTutorialCategory(newCategory);
+    await addCategoryTx.wait();
+    const status = await payoutContract.tutorialStatuses(newCategory);
+    expect(status).to.equal(0); // 0 represents Active in the enum
+  });
+
+  it("Should remove a tutorial category", async function () {
+    const categoryToRemove = "New Tutorial";
+    const removeCategoryTx = await payoutContract.removeTutorialCategory(categoryToRemove);
+    await removeCategoryTx.wait();
+    const status = await payoutContract.tutorialStatuses(categoryToRemove);
+    expect(status).to.equal(1); // 1 represents Inactive in the enum
+  });
+
+  it.only("Should payout to the user if user owns the POAP NFT and the tutorial category is active", async function () {
+    const category = "New Tutorial";
+    // activate category
+    console.log("adding category");
+    const addCategoryTx = await payoutContract.addTutorialCategory(category);
+    await addCategoryTx.wait();
+    const status = await payoutContract.tutorialStatuses(category);
+    expect(status).to.equal(0); // 0 represents Active in the enum
+    console.log("category added");
+    // payout
+    const userBalanceBefore = await userWallet.getBalance();
+    const payoutTx = await payoutContract.payout(userWallet.address, category);
+    await payoutTx.wait();
+    const userBalanceAfter = await userWallet.getBalance();
+    expect(userBalanceAfter.gt(userBalanceBefore)).to.equal(true);
+  });
+
+  it("Should fail when trying to payout with an inactive tutorial category", async function () {
+    const inactiveCategory = "New Tutorial";
+    try {
+      const payoutTx = await payoutContract.payout(userWallet.address, inactiveCategory);
+      await payoutTx.wait();
+      expect.fail("Expected payout to revert due to inactive tutorial category, but it didn't");
+    } catch (error) {
+      expect(error.message).to.include("Invalid or inactive tutorial category");
+    }
+  });
+
+  it("Should fail when trying to payout from a non-owner account", async function () {
+    const category = "New Tutorial";
+    try {
+      await payoutContract.connect(userWallet).payout(userWallet.address, category);
+      expect.fail("Expected payout to revert due to non-owner account, but it didn't");
+    } catch (error) {
+      expect(error.message).to.include("execution reverted: Only the owner can call this function");
+    }
+  });
+
+  it.skip("Should fail when paying out to the same address for the same tutorial name twice", async function () {
+    // TODO: Implement this test
+  });
+});

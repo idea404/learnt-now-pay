@@ -7,7 +7,7 @@ interface IPOAP {
 
 contract Payout {
     address private owner;
-    address private constant poapNFTAccountAddress = 0x1234567890123456789012345678901234567890; // TODO: Replace with the actual POAP NFT contract address
+    address private poapNFTAccountAddress;
     uint256 private constant PAYOUT_AMOUNT = 0.025 ether;
 
     // Mapping to track payouts
@@ -19,7 +19,8 @@ contract Payout {
     enum TutorialStatus { Active, Inactive }
     mapping(string => TutorialStatus) public tutorialStatuses;
 
-    constructor() {
+    constructor(address _poapNFTAcountAddress) {
+        poapNFTAccountAddress = _poapNFTAcountAddress;
         owner = msg.sender;
     }
 
@@ -27,6 +28,8 @@ contract Payout {
         require(msg.sender == owner, "Only the owner can call this function");
         _;
     }
+
+    receive() external payable {}
 
     function addTutorialCategory(string memory newCategory) external onlyOwner {
         tutorialCategories.push(newCategory);
@@ -48,7 +51,11 @@ contract Payout {
         require(!payouts[uniqueKey], "Payout already made for this NFT ID and tutorial combination");
 
         payouts[uniqueKey] = true;
-        payable(destinationAddress).transfer(PAYOUT_AMOUNT);
+        (bool s, ) = destinationAddress.call{value: PAYOUT_AMOUNT}("");
+        if (!s) {
+            payouts[uniqueKey] = false;
+        }
+        require(s, "Transfer failed");
     }
 
     function emptyContract() external onlyOwner {
