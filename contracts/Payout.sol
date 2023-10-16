@@ -13,6 +13,12 @@ contract Payout {
     // Mapping to track payouts
     mapping(bytes32 => bool) private payouts;
 
+    // Dynamic array to represent tutorial categories
+    string[] public tutorialCategories;
+    // Enum to represent the status of each tutorial category
+    enum TutorialStatus { Active, Inactive }
+    mapping(string => TutorialStatus) public tutorialStatuses;
+
     constructor() {
         owner = msg.sender;
     }
@@ -22,7 +28,19 @@ contract Payout {
         _;
     }
 
+    function addTutorialCategory(string memory newCategory) external onlyOwner {
+        tutorialCategories.push(newCategory);
+        tutorialStatuses[newCategory] = TutorialStatus.Active;
+    }
+
+    function removeTutorialCategory(string memory categoryToRemove) external onlyOwner {
+        require(tutorialStatuses[categoryToRemove] == TutorialStatus.Active, "Category not found or already inactive");
+        tutorialStatuses[categoryToRemove] = TutorialStatus.Inactive;
+    }
+
     function payout(address destinationAddress, string memory tutorialName) external onlyOwner {
+        require(tutorialStatuses[tutorialName] == TutorialStatus.Active, "Invalid or inactive tutorial category");
+
         uint256 poapNFTId = IPOAP(poapNFTAccountAddress).tokenOfOwnerByIndex(destinationAddress, 0);
         require(poapNFTId != 0, "The destination address does not own a POAP NFT");
 
