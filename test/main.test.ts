@@ -129,13 +129,11 @@ describe("Payout", function () {
     await mintTx.wait();
 
     // Transfer 1 ETH to payout contract
-    console.log("Transferring 1 ETH to payout contract");
     const transferTx = await ownerWallet.sendTransaction({
       to: payoutContract.address,
       value: ethers.utils.parseEther("1"),
     });
     await transferTx.wait();
-    console.log("1 ETH transferred to payout contract");
   });
 
   it("Should add a new tutorial category", async function () {
@@ -143,27 +141,11 @@ describe("Payout", function () {
     const addCategoryTx = await payoutContract.addTutorialCategory(newCategory);
     await addCategoryTx.wait();
     const status = await payoutContract.tutorialStatuses(newCategory);
-    expect(status).to.equal(0); // 0 represents Active in the enum
+    expect(status).to.equal(1); // 1 represents Active in the enum
   });
 
-  it("Should remove a tutorial category", async function () {
-    const categoryToRemove = "New Tutorial";
-    const removeCategoryTx = await payoutContract.removeTutorialCategory(categoryToRemove);
-    await removeCategoryTx.wait();
-    const status = await payoutContract.tutorialStatuses(categoryToRemove);
-    expect(status).to.equal(1); // 1 represents Inactive in the enum
-  });
-
-  it.only("Should payout to the user if user owns the POAP NFT and the tutorial category is active", async function () {
+  it("Should payout to the user if user owns the POAP NFT and the tutorial category is active", async function () {
     const category = "New Tutorial";
-    // activate category
-    console.log("adding category");
-    const addCategoryTx = await payoutContract.addTutorialCategory(category);
-    await addCategoryTx.wait();
-    const status = await payoutContract.tutorialStatuses(category);
-    expect(status).to.equal(0); // 0 represents Active in the enum
-    console.log("category added");
-    // payout
     const userBalanceBefore = await userWallet.getBalance();
     const payoutTx = await payoutContract.payout(userWallet.address, category);
     await payoutTx.wait();
@@ -171,14 +153,25 @@ describe("Payout", function () {
     expect(userBalanceAfter.gt(userBalanceBefore)).to.equal(true);
   });
 
-  it("Should fail when trying to payout with an inactive tutorial category", async function () {
-    const inactiveCategory = "New Tutorial";
+  it("Should fail when paying out to the same address for the same tutorial name twice", async function () {
+    const category = "New Tutorial";
+    // try to payout again
+    try {
+      await payoutContract.payout(userWallet.address, category);
+      expect.fail("Expected payout to revert due to duplicate payout, but it didn't");
+    } catch (error) {
+      expect(error.message).to.include("execution reverted: Payout already made for this NFT ID and tutorial combination");
+    }
+  });
+
+  it("Should fail when trying to payout with an unexisting tutorial category", async function () {
+    const inactiveCategory = "Inactive Tutorial";
     try {
       const payoutTx = await payoutContract.payout(userWallet.address, inactiveCategory);
       await payoutTx.wait();
       expect.fail("Expected payout to revert due to inactive tutorial category, but it didn't");
     } catch (error) {
-      expect(error.message).to.include("Invalid or inactive tutorial category");
+      expect(error.message).to.include("execution reverted: Tutorial category not found or inactive");
     }
   });
 
@@ -192,7 +185,31 @@ describe("Payout", function () {
     }
   });
 
-  it.skip("Should fail when paying out to the same address for the same tutorial name twice", async function () {
-    // TODO: Implement this test
+  it("Should remove a tutorial category", async function () {
+    const categoryToRemove = "New Tutorial";
+    const removeCategoryTx = await payoutContract.removeTutorialCategory(categoryToRemove);
+    await removeCategoryTx.wait();
+    const status = await payoutContract.tutorialStatuses(categoryToRemove);
+    expect(status).to.equal(2); // 2 represents Inactive in the enum
+  });
+
+  it("Should fail when trying to remove a tutorial category from a non-owner account", async function () {
+    const categoryToRemove = "New Tutorial";
+    try {
+      await payoutContract.connect(userWallet).removeTutorialCategory(categoryToRemove);
+      expect.fail("Expected removeTutorialCategory to revert due to non-owner account, but it didn't");
+    } catch (error) {
+      expect(error.message).to.include("execution reverted: Only the owner can call this function");
+    }
+  });
+
+  it("Should fail when trying to payout for a removed tutorial category", async function () {
+    const category = "New Tutorial";
+    try {
+      await payoutContract.payout(userWallet.address, category);
+      expect.fail("Expected payout to revert due to removed tutorial category, but it didn't");
+    } catch (error) {
+      expect(error.message).to.include("execution reverted: Tutorial category not found or inactive");
+    }
   });
 });

@@ -16,7 +16,7 @@ contract Payout {
     // Dynamic array to represent tutorial categories
     string[] public tutorialCategories;
     // Enum to represent the status of each tutorial category
-    enum TutorialStatus { Active, Inactive }
+    enum TutorialStatus { NotSet, Active, Inactive }
     mapping(string => TutorialStatus) public tutorialStatuses;
 
     constructor(address _poapNFTAcountAddress) {
@@ -32,6 +32,7 @@ contract Payout {
     receive() external payable {}
 
     function addTutorialCategory(string memory newCategory) external onlyOwner {
+        require(tutorialStatuses[newCategory] == TutorialStatus.NotSet, "Category already exists");
         tutorialCategories.push(newCategory);
         tutorialStatuses[newCategory] = TutorialStatus.Active;
     }
@@ -42,7 +43,7 @@ contract Payout {
     }
 
     function payout(address destinationAddress, string memory tutorialName) external onlyOwner {
-        require(tutorialStatuses[tutorialName] == TutorialStatus.Active, "Invalid or inactive tutorial category");
+        require(tutorialStatuses[tutorialName] != TutorialStatus.NotSet && tutorialStatuses[tutorialName] == TutorialStatus.Active, "Tutorial category not found or inactive");
 
         uint256 poapNFTId = IPOAP(poapNFTAccountAddress).tokenOfOwnerByIndex(destinationAddress, 0);
         require(poapNFTId != 0, "The destination address does not own a POAP NFT");
