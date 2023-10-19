@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import * as ethers from 'zksync-web3';
 
-const CONTRACT_ADDRESS = '0x7220a5759FE3AB031632C718bF51D735820889Ee';  // Version of 2023-08-18
+const CONTRACT_ADDRESS = "0xb76eD02Dea1ba444609602BE5D587c4bFfd67153"; // Change to your contract address
 
 function App() {
   const [account, setAccount] = useState(null);
   const [poapNftId, setPoapNftId] = useState('');
-  const [tutorialName, setTutorialName] = useState('Tutorial 1');  // Set default value to 'Tutorial 1'
+  const [tutorialName, setTutorialName] = useState('Tutorial');  // Set default value to 'Tutorial'
   const [deployedTestnetAddress, setDeployedTestnetAddress] = useState('');
 
   const connectMetamask = async () => {
@@ -62,6 +62,7 @@ function App() {
           />
           <select value={tutorialName} onChange={(e) => setTutorialName(e.target.value)}>
             {/* Add your tutorial names here */}
+            <option value="Tutorial">Tutorial</option>
             <option value="Tutorial 1">Tutorial 1</option>
             <option value="Tutorial 2">Tutorial 2</option>
             {/* ... */}

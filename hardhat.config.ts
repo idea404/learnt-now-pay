@@ -6,8 +6,8 @@ import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-verify";
 
 // dynamically changes endpoints for local tests
-export const zkSyncTestnet =
-  process.env.NODE_ENV == "test"
+export const zkSyncNetwork =
+  process.env.NODE_ENV == "test" || process.env.NODE_ENV == "localnet"
     ? {
         url: "http://127.0.0.1:8011",
         ethNetwork: "http://127.0.0.1:8545",
@@ -26,12 +26,12 @@ const config: HardhatUserConfig = {
     version: "latest",
     settings: {},
   },
-  defaultNetwork: "zkSyncTestnet",
+  defaultNetwork: "zkSyncNetwork",
   networks: {
     hardhat: {
       zksync: false,
     },
-    zkSyncTestnet,
+    zkSyncNetwork,
   },
   solidity: {
     version: "0.8.17",

@@ -60,7 +60,8 @@ contract Payout {
     }
 
     function emptyContract() external onlyOwner {
-        payable(owner).transfer(address(this).balance);
+        (bool s, ) = payable(owner).call{value: address(this).balance}("");
+        require(s, "Transfer failed");
     }
 
     // View method to check if a payout has been made for a given NFT ID and tutorial name

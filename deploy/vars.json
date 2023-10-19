@@ -6,5 +6,25 @@
         "address": "0xEE6050F37B19661F431Ae9B9eA1a25a79c1a7E8B"
       }
     ]
+  },
+  "localnet": {
+    "deployed": [
+      {
+        "name": "PoapMultiplier",
+        "address": "0x1F0151386fB0AbBF0273238dF5E9bc519DE5e20B"
+      },
+      {
+        "name": "PoapNFT",
+        "address": "0x9035E63C5Ac74dE843F176BE6B9869cA2385C61d"
+      },
+      {
+        "name": "TutorialSubmission",
+        "address": "0x1055780Bd25e2F698E7c9a95FBaf4cb565A23A14"
+      },
+      {
+        "name": "Payout",
+        "address": "0xF3a4d6E6581e12Dc5b0eCd6EA3d483fF09c3cAE0"
+      }
+    ]
   }
 }

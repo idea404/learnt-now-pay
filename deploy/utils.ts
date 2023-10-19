@@ -51,3 +51,14 @@ export function saveContractToVars(network, contractName, contractAddress: strin
   fs.writeFileSync(varsPath, JSON.stringify(config, null, 2));
 }
 
+export function getContractFromVars(network, contractName, varsPath = JSON_FILE_PATH) {
+  const config = JSON.parse(fs.readFileSync(varsPath, "utf-8"));
+  const deployedContracts = config[network].deployed;
+  const existingContract = deployedContracts.find((contract) => contract.name === contractName);
+
+  if (!existingContract) {
+    throw new Error(`Contract ${contractName} not found in vars.json`);
+  }
+
+  return existingContract;
+}

@@ -49,7 +49,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   saveContractToVars(NETWORK, CONTRACT_NAME, contractAddress);
 
   // verify contract for tesnet & mainnet
-  if (NETWORK != "test") {
+  if (NETWORK != "test" && NETWORK != "localnet") {
     // Contract MUST be fully qualified name (e.g. path/sourceName:contractName)
     const contractFullyQualifedName = `contracts/${CONTRACT_NAME}.sol:${CONTRACT_NAME}`;
 

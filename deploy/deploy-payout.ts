@@ -1,17 +1,20 @@
-import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
-import dotenv from "dotenv";
+import { Wallet } from "zksync-web3";
 import * as ethers from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { Wallet } from "zksync-web3";
+import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
+import dotenv from "dotenv";
 import { getPrivateKey, saveContractToVars } from "./utils";
 
 // load env file
 dotenv.config();
 
 // load wallet private key from env file
-const CONTRACT_NAME = "PoapMultiplier";
+const CONTRACT_NAME = "Payout";
 const NETWORK = process.env.NODE_ENV || "test"; // Default to test if NODE_ENV is not set
 const PRIVATE_KEY = getPrivateKey(NETWORK);
+// constructor args
+const POAP_NFT_ACCOUNT_ADDRESS = "0x094499Df5ee555fFc33aF07862e43c90E6FEe501" // POAP NFT contract address on mainnet (testnet for demo)
+const CONSTRUCTOR_ARGS = [POAP_NFT_ACCOUNT_ADDRESS];
 
 if (!PRIVATE_KEY)
   throw "⛔️ Private key not detected! Add it to the .env file!";
@@ -28,21 +31,21 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const artifact = await deployer.loadArtifact(CONTRACT_NAME);
 
   // Estimate contract deployment fee
-  const deploymentFee = await deployer.estimateDeployFee(artifact, []);
+  const deploymentFee = await deployer.estimateDeployFee(artifact, CONSTRUCTOR_ARGS);
 
   // Deploy this contract. The returned object will be of a `Contract` type, similarly to ones in `ethers`.
   const parsedFee = ethers.utils.formatEther(deploymentFee.toString());
   console.log(`The deployment is estimated to cost ${parsedFee} ETH`);
 
-  const greeterContract = await deployer.deploy(artifact, []);
+  const contract = await deployer.deploy(artifact, CONSTRUCTOR_ARGS);
 
   //obtain the Constructor Arguments
   console.log(
-    "Constructor args:" + greeterContract.interface.encodeDeploy([])
+    "Constructor args:" + contract.interface.encodeDeploy(CONSTRUCTOR_ARGS)
   );
 
   // Show the contract info.
-  const contractAddress = greeterContract.address;
+  const contractAddress = contract.address;
   console.log(`${artifact.contractName} was deployed to ${contractAddress}`);
 
   // Save the deployed contract address to vars.json
@@ -57,7 +60,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     const verificationId = await hre.run("verify:verify", {
       address: contractAddress,
       contract: contractFullyQualifedName,
-      constructorArguments: [],
+      constructorArguments: CONSTRUCTOR_ARGS,
       bytecode: artifact.bytecode,
     });
   } else {
