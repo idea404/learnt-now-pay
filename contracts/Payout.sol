@@ -2,12 +2,12 @@
 pragma solidity ^0.8.17;
 
 interface IPOAP {
-    function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256 tokenId);
+    function ownerOf(uint256 tokenId) external view returns (address);
 }
 
 contract Payout {
     address private owner;
-    address private poapNFTAccountAddress;
+    IPOAP private poapNFTContract; // Use the IPOAP interface to interact with the POAP NFT contract
     uint256 private constant PAYOUT_AMOUNT = 0.025 ether;
 
     // Mapping to track payouts
@@ -20,7 +20,7 @@ contract Payout {
     mapping(string => TutorialStatus) public tutorialStatuses;
 
     constructor(address _poapNFTAcountAddress) {
-        poapNFTAccountAddress = _poapNFTAcountAddress;
+        poapNFTContract = IPOAP(_poapNFTAcountAddress); // Initialize the poapNFTContract using the provided address
         owner = msg.sender;
     }
 
@@ -42,17 +42,18 @@ contract Payout {
         tutorialStatuses[categoryToRemove] = TutorialStatus.Inactive;
     }
 
-    function payout(address destinationAddress, string memory tutorialName) external onlyOwner {
+    function payout(uint256 poapNFTId, string memory tutorialName) external onlyOwner {
         require(tutorialStatuses[tutorialName] != TutorialStatus.NotSet && tutorialStatuses[tutorialName] == TutorialStatus.Active, "Tutorial category not found or inactive");
-
-        uint256 poapNFTId = IPOAP(poapNFTAccountAddress).tokenOfOwnerByIndex(destinationAddress, 0);
-        require(poapNFTId != 0, "The destination address does not own a POAP NFT");
 
         bytes32 uniqueKey = keccak256(abi.encodePacked(poapNFTId, tutorialName));
         require(!payouts[uniqueKey], "Payout already made for this NFT ID and tutorial combination");
 
+        // Retrieve the owner of the NFT using the ownerOf function
+        address nftOwner = poapNFTContract.ownerOf(poapNFTId);
+        require(nftOwner != address(0), "Invalid NFT ID");
+
         payouts[uniqueKey] = true;
-        (bool s, ) = destinationAddress.call{value: PAYOUT_AMOUNT}("");
+        (bool s, ) = nftOwner.call{value: PAYOUT_AMOUNT}("");
         if (!s) {
             payouts[uniqueKey] = false;
         }

@@ -147,7 +147,9 @@ describe("Payout", function () {
   it("Should payout to the user if user owns the POAP NFT and the tutorial category is active", async function () {
     const category = "New Tutorial";
     const userBalanceBefore = await userWallet.getBalance();
-    const payoutTx = await payoutContract.payout(userWallet.address, category);
+    // get the POAP NFT ID
+    const poapNftId = await poapNFTContract.tokenOfOwnerByIndex(userWallet.address, 0);
+    const payoutTx = await payoutContract.payout(poapNftId, category);
     await payoutTx.wait();
     const userBalanceAfter = await userWallet.getBalance();
     expect(userBalanceAfter.gt(userBalanceBefore)).to.equal(true);
@@ -157,7 +159,8 @@ describe("Payout", function () {
     const category = "New Tutorial";
     // try to payout again
     try {
-      await payoutContract.payout(userWallet.address, category);
+      const poapNftId = await poapNFTContract.tokenOfOwnerByIndex(userWallet.address, 0);
+      await payoutContract.payout(poapNftId, category);
       expect.fail("Expected payout to revert due to duplicate payout, but it didn't");
     } catch (error) {
       expect(error.message).to.include("execution reverted: Payout already made for this NFT ID and tutorial combination");
@@ -167,7 +170,8 @@ describe("Payout", function () {
   it("Should fail when trying to payout with an unexisting tutorial category", async function () {
     const inactiveCategory = "Inactive Tutorial";
     try {
-      const payoutTx = await payoutContract.payout(userWallet.address, inactiveCategory);
+      const poapNftId = await poapNFTContract.tokenOfOwnerByIndex(userWallet.address, 0);
+      const payoutTx = await payoutContract.payout(poapNftId, inactiveCategory);
       await payoutTx.wait();
       expect.fail("Expected payout to revert due to inactive tutorial category, but it didn't");
     } catch (error) {
@@ -178,7 +182,8 @@ describe("Payout", function () {
   it("Should fail when trying to payout from a non-owner account", async function () {
     const category = "New Tutorial";
     try {
-      await payoutContract.connect(userWallet).payout(userWallet.address, category);
+      const poapNftId = await poapNFTContract.tokenOfOwnerByIndex(userWallet.address, 0);
+      await payoutContract.connect(userWallet).payout(poapNftId, category);
       expect.fail("Expected payout to revert due to non-owner account, but it didn't");
     } catch (error) {
       expect(error.message).to.include("execution reverted: Only the owner can call this function");
@@ -206,7 +211,8 @@ describe("Payout", function () {
   it("Should fail when trying to payout for a removed tutorial category", async function () {
     const category = "New Tutorial";
     try {
-      await payoutContract.payout(userWallet.address, category);
+      const poapNftId = await poapNFTContract.tokenOfOwnerByIndex(userWallet.address, 0);
+      await payoutContract.payout(poapNftId, category);
       expect.fail("Expected payout to revert due to removed tutorial category, but it didn't");
     } catch (error) {
       expect(error.message).to.include("execution reverted: Tutorial category not found or inactive");

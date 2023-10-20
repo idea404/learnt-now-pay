@@ -23,19 +23,21 @@ class SubmissionsManager:
       payout_contract_address: str, 
       l2_rpc_url: str = "https://zksync2-testnet.zksync.dev"
   ) -> None:
-    log.info(f"Initializing SubmissionsManager with submissions manager contract {submissions_manager_contract} and payout contract address {payout_contract_address}...")
+    log.info(f"Initializing SubmissionsManager with submissions manager contract {submissions_manager_contract} and payout contract address {payout_contract_address} on {l2_rpc_url}...")
     self._dir = pathlib.Path(__file__).parent.resolve()
 
     private_key = get_private_key(l2_rpc_url)
     self.account: LocalAccount = Account.from_key(private_key)
     self.zkweb3 = ZkSyncBuilder.build(l2_rpc_url)
-    self.contract_json_path = self._dir.parent.parent / "artifacts-zk" / "contracts" / "TutorialSubmission.sol" / "TutorialSubmission.json"
+    self.submissions_contract_json_path = self._dir.parent.parent / "artifacts-zk" / "contracts" / "TutorialSubmission.sol" / "TutorialSubmission.json"
+    self.submitted_contract_json_path = self._dir.parent.parent / "artifacts-zk" / "contracts" / "PoapMultiplier.sol" / "PoapMultiplier.json"
+    self.payout_contract_json_path = self._dir.parent.parent / "artifacts-zk" / "contracts" / "Payout.sol" / "Payout.json"
     self.submissions_manager_contract = submissions_manager_contract
     self.payout_contract_address = payout_contract_address
 
   def get_submissions(self) -> list[Submission]:
     sumbissions_contract = self.zkweb3.to_checksum_address(self.submissions_manager_contract)
-    data = get_submitted_submissions_raw(self.zkweb3, self.contract_json_path, sumbissions_contract)
+    data = get_submitted_submissions_raw(self.zkweb3, self.submissions_contract_json_path, sumbissions_contract)
     submissions = [Submission(*submission) for submission in data]
     return submissions
   
@@ -43,7 +45,7 @@ class SubmissionsManager:
     tx_hash = change_submission_state(
         self.zkweb3,
         self.account,
-        self.contract_json_path,
+        self.submissions_contract_json_path,
         self.submissions_manager_contract,
         submission.poap_nft_id,
         submission.tutorial_name,
@@ -72,11 +74,12 @@ class SubmissionsManager:
   def test_pending_submissions(self) -> None:
     log.info(f"Testing pending submissions...")
     submissions = self.get_submissions()
+    log.debug(f"Found {len(submissions)} submissions...")
     testable_submissions = [submission for submission in submissions if submission.status == Status.PENDING.value]
     log.info(f"Found {len(testable_submissions)} testable submissions...")
     for submission in testable_submissions:
       log.info(f"Testing {submission}...")
-      test_result = test_submission(submission, self.zkweb3, self.contract_json_path)
+      test_result = test_submission(submission, self.zkweb3, self.submitted_contract_json_path)
       new_submission_status = Status.VALID.value if test_result else Status.INVALID.value
       self.update_submission_status(submission, new_submission_status)
 
@@ -85,7 +88,7 @@ class SubmissionsManager:
     hex_of_tx = call_payout_contract(
       self.zkweb3,
       self.account,
-      self.contract_json_path,
+      self.payout_contract_json_path,
       self.payout_contract_address,
       submission.poap_nft_id,
       submission.tutorial_name,
@@ -111,9 +114,9 @@ class SubmissionsManager:
 
 if __name__ == "__main__":
   tutorials_scanner = SubmissionsManager(
-    submissions_manager_contract="0x77f06527Ee819D84E4b76e7EB6b9C3Eedf0E90c6", # TODO: Add submissions manager contract address here
-    payout_contract_address="0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66", # TODO: Add payout contract address here
-    l2_rpc_url="https://zksync2-testnet.zksync.dev"
-    # l2_rpc_url="http://127.0.0.1:8011"
+    submissions_manager_contract="0x111C3E89Ce80e62EE88318C2804920D4c96f92bb", # TODO: Add submissions manager contract address here
+    payout_contract_address="0xb76eD02Dea1ba444609602BE5D587c4bFfd67153", # TODO: Add payout contract address here
+    # l2_rpc_url="https://zksync2-testnet.zksync.dev"
+    l2_rpc_url="http://127.0.0.1:8011"
   )
   tutorials_scanner.run()

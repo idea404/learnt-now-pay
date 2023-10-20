@@ -64,3 +64,15 @@ def change_submission_state(
     signed_tx = account.sign_transaction(tx)
     tx_hash = zk_web3.zksync.send_raw_transaction(signed_tx.rawTransaction) # type: ignore
     return tx_hash.hex()
+
+
+if __name__ == "__main__":
+    from zksync2.module.module_builder import ZkSyncBuilder
+    zkw3 = ZkSyncBuilder.build("http://127.0.0.1:8011")
+    import pathlib
+    this_dir = pathlib.Path(__file__).parent.resolve()
+    contract_json_path = this_dir.parent.parent / "artifacts-zk" / "contracts" / "TutorialSubmission.sol" / "TutorialSubmission.json"
+    contract_address = "0x111C3E89Ce80e62EE88318C2804920D4c96f92bb"
+    res = get_submitted_submissions_raw(zkw3, contract_json_path, contract_address)
+    import pprint
+    pprint.pprint(res)
