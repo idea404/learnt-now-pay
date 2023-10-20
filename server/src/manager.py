@@ -111,8 +111,9 @@ class SubmissionsManager:
 
 if __name__ == "__main__":
   tutorials_scanner = SubmissionsManager(
-    submissions_manager_contract="0xb76eD02Dea1ba444609602BE5D587c4bFfd67153", # TODO: Add submissions manager contract address here
-    payout_contract_address="0x0a67078A35745947A37A552174aFe724D8180c25", # TODO: Add payout contract address here
-    l2_rpc_url="http://127.0.0.1:8011"
+    submissions_manager_contract="0x77f06527Ee819D84E4b76e7EB6b9C3Eedf0E90c6", # TODO: Add submissions manager contract address here
+    payout_contract_address="0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66", # TODO: Add payout contract address here
+    l2_rpc_url="https://zksync2-testnet.zksync.dev"
+    # l2_rpc_url="http://127.0.0.1:8011"
   )
   tutorials_scanner.run()

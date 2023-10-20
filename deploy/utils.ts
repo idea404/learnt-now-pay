@@ -26,7 +26,7 @@ export function getPrivateKey(network: string): string {
   return privateKey;
 }
 
-export function saveContractToVars(network, contractName, contractAddress: string, varsPath = JSON_FILE_PATH) {
+export function saveContractToVars(network: string, contractName: string, contractAddress: string, varsPath = JSON_FILE_PATH) {
   console.log(`Saving ${contractName} to vars.json`);
   const config = JSON.parse(fs.readFileSync(varsPath, "utf-8"));
 
@@ -35,7 +35,7 @@ export function saveContractToVars(network, contractName, contractAddress: strin
   }
 
   const deployedContracts = config[network].deployed;
-  const existingContractIndex = deployedContracts.findIndex((contract) => contract.name === contractName);
+  const existingContractIndex = deployedContracts.findIndex((contract: { name: string; }) => contract.name === contractName);
 
   if (existingContractIndex === -1) {
     console.log(`Adding ${contractName} to vars.json`);
@@ -51,10 +51,10 @@ export function saveContractToVars(network, contractName, contractAddress: strin
   fs.writeFileSync(varsPath, JSON.stringify(config, null, 2));
 }
 
-export function getContractFromVars(network, contractName, varsPath = JSON_FILE_PATH) {
+export function getContractFromVars(network: string, contractName: string, varsPath = JSON_FILE_PATH) {
   const config = JSON.parse(fs.readFileSync(varsPath, "utf-8"));
   const deployedContracts = config[network].deployed;
-  const existingContract = deployedContracts.find((contract) => contract.name === contractName);
+  const existingContract = deployedContracts.find((contract: { name: string; }) => contract.name === contractName);
 
   if (!existingContract) {
     throw new Error(`Contract ${contractName} not found in vars.json`);

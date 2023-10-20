@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as ethers from 'zksync-web3';
 
-const CONTRACT_ADDRESS = "0xb76eD02Dea1ba444609602BE5D587c4bFfd67153"; // Change to your contract address
+const CONTRACT_ADDRESS = "0x77f06527Ee819D84E4b76e7EB6b9C3Eedf0E90c6"; // Change to Submissions Manager contract address
 
 function App() {
   const [account, setAccount] = useState(null);
