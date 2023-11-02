@@ -67,12 +67,38 @@ def change_submission_state(
 
 
 if __name__ == "__main__":
+    # config
     from zksync2.module.module_builder import ZkSyncBuilder
-    zkw3 = ZkSyncBuilder.build("http://127.0.0.1:8011")
+    l2_rpc_url = "https://zksync2-testnet.zksync.dev"
+    zkw3 = ZkSyncBuilder.build(l2_rpc_url)
     import pathlib
     this_dir = pathlib.Path(__file__).parent.resolve()
-    contract_json_path = this_dir.parent.parent / "artifacts-zk" / "contracts" / "TutorialSubmission.sol" / "TutorialSubmission.json"
-    contract_address = "0x111C3E89Ce80e62EE88318C2804920D4c96f92bb"
-    res = get_submitted_submissions_raw(zkw3, contract_json_path, contract_address)
-    import pprint
-    pprint.pprint(res)
+    submissions_contract_json_path = this_dir.parent.parent / "artifacts-zk" / "contracts" / "TutorialSubmission.sol" / "TutorialSubmission.json"
+    submissions_contract_address = "0x28f959283F7Fc0a9c56e9Dc70e9d77dE99442603"
+    from eth_account import Account
+    from utils import get_private_key
+    private_key = get_private_key(l2_rpc_url)
+    account: LocalAccount = Account.from_key(private_key)
+
+    # print submissions on submissions contract
+    # res = get_submitted_submissions_raw(zkw3, submissions_contract_json_path, submissions_contract_address)
+    # import pprint
+    # pprint.pprint(res)
+
+    # call payout contract
+    payout_contract_json_path = this_dir.parent.parent / "artifacts-zk" / "contracts" / "Payout.sol" / "Payout.json"
+    payout_contract_address = "0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66"
+    poap_nft_id = 1
+    tutorial_name = "PoapMultiplier"
+    try:
+        tx_hash = call_payout_contract(
+            zkw3,
+            account,
+            payout_contract_json_path,
+            payout_contract_address,
+            poap_nft_id,
+            tutorial_name,
+        )
+        print(tx_hash)
+    except Exception as e:
+        print(e)

@@ -3,19 +3,19 @@
     "deployed": [
       {
         "name": "PoapMultiplier",
-        "address": "0xEE6050F37B19661F431Ae9B9eA1a25a79c1a7E8B"
+        "address": "0x555492731ec1ADf061Eb34Cc8572E60f5aa61e96"
       },
       {
         "name": "TutorialSubmission",
-        "address": "0x77f06527Ee819D84E4b76e7EB6b9C3Eedf0E90c6"
+        "address": "0x28f959283F7Fc0a9c56e9Dc70e9d77dE99442603"
       },
       {
         "name": "PoapNFT",
-        "address": "0x775Ba83C23D2a42C8A33957A17B37c7F1872177f"
+        "address": "0xcCeBACEbADaC48d20Ce0cfB264021159Cc66a209"
       },
       {
         "name": "Payout",
-        "address": "0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66"
+        "address": "0xbB0B60372e54b8529CDD43F558117A7A4AA03600"
       }
     ]
   },

@@ -4,17 +4,22 @@ import "@matterlabs/hardhat-zksync-deploy";
 import "@matterlabs/hardhat-zksync-solc";
 
 import "@matterlabs/hardhat-zksync-verify";
+import { getL2RpcUrl } from "./deploy/utils";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // dynamically changes endpoints for local tests
+const L2_RPC_URL = getL2RpcUrl(process.env.NODE_ENV || "test");
 export const zkSyncNetwork =
   process.env.NODE_ENV == "test" || process.env.NODE_ENV == "localnet"
     ? {
-        url: "http://127.0.0.1:8011",
+        url: L2_RPC_URL,
         ethNetwork: "http://127.0.0.1:8545",
         zksync: true,
       }
     : {
-        url: "https://zksync2-testnet.zksync.dev",
+        url: L2_RPC_URL,
         ethNetwork: "goerli",
         zksync: true,
         // contract verification endpoint

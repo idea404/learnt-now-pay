@@ -26,6 +26,52 @@ export function getPrivateKey(network: string): string {
   return privateKey;
 }
 
+export function getUserPrivateKey(network: string): string {
+  let privateKey: string | undefined;
+
+  if (network == "test") {
+    privateKey = process.env.USER_PRIVATE_KEY_TEST;
+  }
+  if (network == "localnet") {
+    privateKey = process.env.USER_PRIVATE_KEY_LOCALNET;
+  }
+  if (network == "testnet") {
+    privateKey = process.env.USER_PRIVATE_KEY_TESTNET;
+  }
+  if (network == "mainnet") {
+    privateKey = process.env.USER_PRIVATE_KEY_MAINNET;
+  }
+
+  if (!privateKey) {
+    throw "⛔️ Private key not detected! Add it to the .env file!";
+  }
+
+  return privateKey;
+}
+
+export function getL2RpcUrl(network: string): string {
+  let rpcUrl: string | undefined;
+
+  if (network == "test") {
+    rpcUrl = process.env.L2_RPC_URL_TEST;
+  }
+  if (network == "localnet") {
+    rpcUrl = process.env.L2_RPC_URL_LOCALNET;
+  }
+  if (network == "testnet") {
+    rpcUrl = process.env.L2_RPC_URL_TESTNET;
+  }
+  if (network == "mainnet") {
+    rpcUrl = process.env.L2_RPC_URL_MAINNET;
+  }
+
+  if (!rpcUrl) {
+    throw "⛔️ L2 RPC URL not detected! Add it to the .env file!";
+  }
+
+  return rpcUrl;
+}
+
 export function saveContractToVars(network: string, contractName: string, contractAddress: string, varsPath = JSON_FILE_PATH) {
   console.log(`Saving ${contractName} to vars.json`);
   const config = JSON.parse(fs.readFileSync(varsPath, "utf-8"));
@@ -51,7 +97,7 @@ export function saveContractToVars(network: string, contractName: string, contra
   fs.writeFileSync(varsPath, JSON.stringify(config, null, 2));
 }
 
-export function getContractFromVars(network: string, contractName: string, varsPath = JSON_FILE_PATH) {
+export function getDeployedContractDetailsFromVars(network: string, contractName: string, varsPath = JSON_FILE_PATH) {
   const config = JSON.parse(fs.readFileSync(varsPath, "utf-8"));
   const deployedContracts = config[network].deployed;
   const existingContract = deployedContracts.find((contract: { name: string; }) => contract.name === contractName);

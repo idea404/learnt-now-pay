@@ -52,6 +52,7 @@ class SubmissionsManager:
         new_status
     )
     log.info(f"{submission} updated to status {new_status} with transaction hash {tx_hash}")
+    time.sleep(5)
     submissions = self.get_submissions()
     matching_submission = [submission for submission in submissions if submission.poap_nft_id == submission.poap_nft_id and submission.tutorial_name == submission.tutorial_name][0]
     assert matching_submission.status == new_status, f"Submission with ID {submission.poap_nft_id} not updated to status {new_status}"
@@ -109,14 +110,13 @@ class SubmissionsManager:
 
   def run(self) -> None:
     self.test_pending_submissions()
-    self.pay_valid_submissions()
+    # self.pay_valid_submissions()
 
 
 if __name__ == "__main__":
   tutorials_scanner = SubmissionsManager(
-    submissions_manager_contract="0x111C3E89Ce80e62EE88318C2804920D4c96f92bb", # TODO: Add submissions manager contract address here
-    payout_contract_address="0xb76eD02Dea1ba444609602BE5D587c4bFfd67153", # TODO: Add payout contract address here
-    # l2_rpc_url="https://zksync2-testnet.zksync.dev"
-    l2_rpc_url="http://127.0.0.1:8011"
+    submissions_manager_contract="0x28f959283F7Fc0a9c56e9Dc70e9d77dE99442603", # TODO: Add submissions manager contract address here
+    payout_contract_address="0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66", # TODO: Add payout contract address here
+    # l2_rpc_url="http://127.0.0.1:8011"
   )
   tutorials_scanner.run()

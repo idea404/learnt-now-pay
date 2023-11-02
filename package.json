@@ -31,6 +31,9 @@
     "deploy:multiplier": "yarn hardhat deploy-zksync --script deploy-multiplier.ts",
     "deploy:poap": "yarn hardhat deploy-zksync --script deploy-poap.ts",
     "deploy:payout": "yarn hardhat deploy-zksync --script deploy-payout.ts",
-    "demo": "ts-node demo/demo.ts"
+    "demo": "yarn demo:setup && yarn demo:submit",
+    "demo:setup": "ts-node demo/demo-setup.ts",
+    "demo:submit": "ts-node demo/demo-submit.ts",
+    "payout": "ts-node server/payer/pay-valid-submissions.ts"
   }
 }
