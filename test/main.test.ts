@@ -77,7 +77,35 @@ describe("TutorialSubmission", function () {
     }
   });
 
-  it("Should fail when user tries to add a submission with the same poapNftId and tutorialName", async function () {
+  it("Should pass when user tries to add a submission with the same poapNftId and tutorialName and different deploy address", async function () {
+    const submission = {
+      poapNftId: 1,
+      deployedTestnetAddress: "0x1230000000",
+      tutorialName: "Tutorial 1",
+    };
+    const userTutorialContract = new Contract(tutorialContract.address, tutorialContract.interface, userWallet);
+    const addSubmissionTx = await userTutorialContract.submitTutorial(submission.poapNftId, submission.deployedTestnetAddress, submission.tutorialName);
+    await addSubmissionTx.wait();
+    let expected = [
+      {
+        poapNftId: 1,
+        deployedTestnetAddress: '0x0000000000',
+        tutorialName: 'Tutorial 1',
+        status: 'APPROVED'
+      },
+      {
+        poapNftId: 1,
+        deployedTestnetAddress: '0x1230000000',
+        tutorialName: 'Tutorial 1',
+        status: 'PENDING'
+      }
+    ];
+    const secondRaw = await tutorialContract.viewSubmissions();
+    const second = secondRaw.map(convertToSubmissionObject);
+    expect(second).to.deep.equal(expected);
+  });
+
+  it("Should fail when user tries to add a submission with the same poapNftId and tutorialName and same deploy address", async function () {
     const submission = {
       poapNftId: 1,
       deployedTestnetAddress: "0x0000000000",

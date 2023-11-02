@@ -2,11 +2,11 @@
 
 
 if __name__ == "__main__":
-    from server.src.tester import SubmissionsTester
-    from server.src.utils import get_l2_rpc_url, get_contract_address
+    from tester import SubmissionsTester
+    from utils import get_l2_rpc_url, get_contract_address
     import os
 
-    network = os.getenv("NODE_ENV")
+    network = os.getenv("NODE_ENV") or "test"
     rpc_url = get_l2_rpc_url(network)
 
     manager = SubmissionsTester(

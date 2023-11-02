@@ -40,17 +40,19 @@ contract TutorialSubmission {
         _;
     }
 
-    function _assertIsNewTutorial(uint256 poapNftId, string memory tutorialName) private view {
+    function _assertIsNewTutorial(uint256 poapNftId, string memory tutorialName, string memory deployedTestnetAddress) private view {
         for (uint256 i = 0; i < accountSubmissions[poapNftId].length; i++) {
             Submission memory submission = accountSubmissions[poapNftId][i];
-            if (keccak256(abi.encodePacked(submission.tutorialName)) == keccak256(abi.encodePacked(tutorialName))) {
+            bool isSameTutorial = keccak256(abi.encodePacked(submission.tutorialName)) == keccak256(abi.encodePacked(tutorialName));
+            bool isSameDeployedAddress = keccak256(abi.encodePacked(submission.deployedTestnetAddress)) == keccak256(abi.encodePacked(deployedTestnetAddress));
+            if (isSameTutorial && isSameDeployedAddress) {
                 revert("Tutorial already submitted");
             }
         }
     }
 
     function submitTutorial(uint256 poapNftId, string memory deployedTestnetAddress, string memory tutorialName) public {
-        _assertIsNewTutorial(poapNftId, tutorialName);
+        _assertIsNewTutorial(poapNftId, tutorialName, deployedTestnetAddress);
 
         Submission memory newSubmission = Submission({
             poapNftId: poapNftId,

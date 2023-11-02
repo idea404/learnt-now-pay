@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as ethers from 'zksync-web3';
 
-const CONTRACT_ADDRESS = "0x111C3E89Ce80e62EE88318C2804920D4c96f92bb"; // Get contract address from deploy script: TutorialSubmission
+const CONTRACT_ADDRESS = "0x28f959283F7Fc0a9c56e9Dc70e9d77dE99442603"; // Get contract address from deploy script: TutorialSubmission
 
 function App() {
   const [account, setAccount] = useState(null);
@@ -62,7 +62,7 @@ function App() {
           />
           <select value={tutorialName} onChange={(e) => setTutorialName(e.target.value)}>
             {/* Add your tutorial names here */}
-            <option value="Tutorial">Tutorial</option>
+            <option value="PoapMultiplier">PoapMultiplier</option>
             <option value="Tutorial 1">Tutorial 1</option>
             <option value="Tutorial 2">Tutorial 2</option>
             {/* ... */}

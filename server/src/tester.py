@@ -10,7 +10,7 @@ from actions import (
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
 from structlog import get_logger
-from server.src.tests import test_submission
+from tests import test_submission
 from utils import Status, Submission, get_private_key
 from zksync2.module.module_builder import ZkSyncBuilder
 
