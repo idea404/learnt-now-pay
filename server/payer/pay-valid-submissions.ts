@@ -25,9 +25,9 @@ const tsAbi = tsArtifact.abi;
 
 async function main() {
   const provider = new Provider(RPC_URL);
-  const userWallet = new Wallet(PRIVATE_KEY, provider);
-  const submissionsContract = new ethers.Contract(getDeployedContractDetailsFromVars(NETWORK, "TutorialSubmission").address, tsAbi, userWallet);
-  const payoutContract = new ethers.Contract(getDeployedContractDetailsFromVars(NETWORK, "Payout").address, poAbi, userWallet);
+  const ownerWallet = new Wallet(PRIVATE_KEY, provider);
+  const submissionsContract = new ethers.Contract(getDeployedContractDetailsFromVars(NETWORK, "TutorialSubmission").address, tsAbi, ownerWallet);
+  const payoutContract = new ethers.Contract(getDeployedContractDetailsFromVars(NETWORK, "Payout").address, poAbi, ownerWallet);
 
   const submissions = await submissionsContract.viewSubmissions();
   // filter submissions for those with 'status' of 'VALID'

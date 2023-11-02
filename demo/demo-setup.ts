@@ -1,5 +1,5 @@
 // This script should:
-// 1. mint an NFT for a provided address and a provided RPC URL and print ID of minted NFT
+// 1. mint an NFT for a provided user address and print ID of minted NFT
 // 2. call the `addTutorialCategory` function of the payout contract and add a "Tutorial" category
 // 3. send ETH to the recipient address
 
@@ -37,26 +37,26 @@ async function main() {
   const poapNFTContract = new ethers.Contract(POAP_NFT_CONTRACT_ADDRESS, PoapNFTAbi, wallet);
   const payoutContract = new ethers.Contract(PAYOUT_CONTRACT_ADDRESS, PayoutAbi, wallet);
 
-  // 1. Mint an NFT for the provided address
-  // try {
-  //   const mintTx = await poapNFTContract.mint(NFT_RECIPIENT_ADDRESS);
-  //   await mintTx.wait();
-  //   // 1.1 Print ID of minted NFT
-  //   const tokenId = await poapNFTContract.tokenOfOwnerByIndex(NFT_RECIPIENT_ADDRESS, 0);
-  //   console.log(`Minted NFT with ID: ${tokenId.toString()}`);
-  //   USER_NFT_ID = tokenId;
-  // } catch (e: any) {
-  //   console.log('NFT already minted', "Contract reason:", e.error.reason);
-  // }
+  // 1. Mint an NFT for the user address
+  try {
+    const mintTx = await poapNFTContract.mint(NFT_RECIPIENT_ADDRESS);
+    await mintTx.wait();
+    // 1.1 Print ID of minted NFT
+    const tokenId = await poapNFTContract.tokenOfOwnerByIndex(NFT_RECIPIENT_ADDRESS, 0);
+    console.log(`Minted NFT with ID: ${tokenId.toString()}`);
+    USER_NFT_ID = tokenId;
+  } catch (e: any) {
+    console.log('NFT already minted', "Contract reason:", e.error.reason);
+  }
 
   // 2. Call the `addTutorialCategory` function of the payout contract
-  // try {
-  //   const addCategoryTx = await payoutContract.addTutorialCategory(TUTORIAL_CATEGORY);
-  //   await addCategoryTx.wait();
-  //   console.log(`Added tutorial category ${TUTORIAL_CATEGORY}`);
-  // } catch (e: any) {
-  //   console.log('Category already exists', "Contract reason:", e.error.reason);
-  // }
+  try {
+    const addCategoryTx = await payoutContract.addTutorialCategory(TUTORIAL_CATEGORY);
+    await addCategoryTx.wait();
+    console.log(`Added tutorial category ${TUTORIAL_CATEGORY}`);
+  } catch (e: any) {
+    console.log('Category already exists', "Contract reason:", e.error.reason);
+  }
 
   // 3. Send ETH to the payout address
   try {

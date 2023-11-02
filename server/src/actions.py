@@ -81,24 +81,24 @@ if __name__ == "__main__":
     account: LocalAccount = Account.from_key(private_key)
 
     # print submissions on submissions contract
-    # res = get_submitted_submissions_raw(zkw3, submissions_contract_json_path, submissions_contract_address)
-    # import pprint
-    # pprint.pprint(res)
+    res = get_submitted_submissions_raw(zkw3, submissions_contract_json_path, submissions_contract_address)
+    import pprint
+    pprint.pprint(res)
 
     # call payout contract
-    payout_contract_json_path = this_dir.parent.parent / "artifacts-zk" / "contracts" / "Payout.sol" / "Payout.json"
-    payout_contract_address = "0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66"
-    poap_nft_id = 1
-    tutorial_name = "PoapMultiplier"
-    try:
-        tx_hash = call_payout_contract(
-            zkw3,
-            account,
-            payout_contract_json_path,
-            payout_contract_address,
-            poap_nft_id,
-            tutorial_name,
-        )
-        print(tx_hash)
-    except Exception as e:
-        print(e)
+    # payout_contract_json_path = this_dir.parent.parent / "artifacts-zk" / "contracts" / "Payout.sol" / "Payout.json"
+    # payout_contract_address = "0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66"
+    # poap_nft_id = 1
+    # tutorial_name = "PoapMultiplier"
+    # try:
+    #     tx_hash = call_payout_contract(
+    #         zkw3,
+    #         account,
+    #         payout_contract_json_path,
+    #         payout_contract_address,
+    #         poap_nft_id,
+    #         tutorial_name,
+    #     )
+    #     print(tx_hash)
+    # except Exception as e:
+    #     print(e)

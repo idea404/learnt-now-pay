@@ -3,7 +3,7 @@ import * as ethers from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 import dotenv from "dotenv";
-import { getPrivateKey, saveContractToVars } from "./utils";
+import { getDeployedContractDetailsFromVars, getPrivateKey, saveContractToVars } from "./utils";
 
 // load env file
 dotenv.config();
@@ -13,7 +13,7 @@ const CONTRACT_NAME = "Payout";
 const NETWORK = process.env.NODE_ENV || "test"; // Default to test if NODE_ENV is not set
 const PRIVATE_KEY = getPrivateKey(NETWORK);
 // constructor args
-const POAP_NFT_ACCOUNT_ADDRESS = "0x094499Df5ee555fFc33aF07862e43c90E6FEe501" // POAP NFT contract address on mainnet (testnet for demo)
+const POAP_NFT_ACCOUNT_ADDRESS = getDeployedContractDetailsFromVars(NETWORK, "PoapNFT").address;
 const CONSTRUCTOR_ARGS = [POAP_NFT_ACCOUNT_ADDRESS];
 
 if (!PRIVATE_KEY)

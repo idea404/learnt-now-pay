@@ -10,13 +10,13 @@ from actions import (
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
 from structlog import get_logger
-from tester import test_submission
+from server.src.tests import test_submission
 from utils import Status, Submission, get_private_key
 from zksync2.module.module_builder import ZkSyncBuilder
 
 log = get_logger(__name__)
 
-class SubmissionsManager:
+class SubmissionsTester:
   def __init__(
       self, 
       submissions_manager_contract: str, 
@@ -55,7 +55,7 @@ class SubmissionsManager:
     time.sleep(5)
     submissions = self.get_submissions()
     matching_submission = [submission for submission in submissions if submission.poap_nft_id == submission.poap_nft_id and submission.tutorial_name == submission.tutorial_name][0]
-    assert matching_submission.status == new_status, f"Submission with ID {submission.poap_nft_id} not updated to status {new_status}"
+    assert matching_submission.status == new_status, f"Submission with NFT ID {submission.poap_nft_id} and tutorial {submission.tutorial_name} not updated to status {new_status}"
   
   def update_submission_status(self, submission: Submission, new_status: str) -> None:
     log.info(f"Updating {submission} to status {new_status}...")
@@ -68,7 +68,8 @@ class SubmissionsManager:
       try:
         self._update_submission_status(submission, new_status)
       except Exception as e:
-        log.error(f"Failed to update {submission} to status {new_status}: {e}")
+        log.error(f"Failed after retry to update {submission} to status {new_status}: {e}")
+        raise e
     except Exception as e:
       log.error(f"Failed to update {submission} to status {new_status}: {e}")
 
@@ -102,21 +103,22 @@ class SubmissionsManager:
     valid_submissions = [submission for submission in submissions if submission.status == Status.VALID.value]
     log.info(f"Found {len(valid_submissions)} payable valid submissions...")
     for submission in valid_submissions:
+      self.update_submission_status(submission, Status.PAID.value)
       try:
         self.delegate_payout(submission)
-        self.update_submission_status(submission, Status.PAID.value)
       except Exception as e:
         log.error(f"Failed to send payout for {submission}: {e}")
+        self.update_submission_status(submission, Status.VALID.value)
 
   def run(self) -> None:
     self.test_pending_submissions()
-    # self.pay_valid_submissions()
+    # self.pay_valid_submissions() # Works unreliably on testnet, so it's not used
 
 
 if __name__ == "__main__":
-  tutorials_scanner = SubmissionsManager(
+  tutorials_scanner = SubmissionsTester(
     submissions_manager_contract="0x28f959283F7Fc0a9c56e9Dc70e9d77dE99442603", # TODO: Add submissions manager contract address here
-    payout_contract_address="0xc9360C3De34f4E24b16D0db01BbB87F5a7Ecbc66", # TODO: Add payout contract address here
+    payout_contract_address="0x717bDf180313EF63f4380bFC9de806aD73a93c80", # TODO: Add payout contract address here
     # l2_rpc_url="http://127.0.0.1:8011"
   )
   tutorials_scanner.run()
