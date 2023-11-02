@@ -36,16 +36,18 @@ def get_l2_rpc_url(network):
         return "http://127.0.0.1:3050"
     if network == "testnet":
         return "https://zksync2-testnet.zksync.dev"
-    raise Exception("Invalid network")
+    raise NotImplementedError(f"Network {network} not yet supported")
 
-def get_private_key(rpc_url):
-    private_key = os.getenv("PRIVATE_KEY")
-    if rpc_url == "https://zksync2-testnet.zksync.dev":
-        private_key = os.getenv("WALLET_PRIVATE_KEY_TESTNET")
-    if rpc_url == "http://127.0.0.1:8011":
-        private_key = os.getenv("WALLET_PRIVATE_KEY_LOCALNET")
-    assert private_key is not None, "PRIVATE_KEY environment variable not set"
-    return private_key
+def get_private_key(network):
+    if network == "test":
+        return "7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110"
+    if network == "localnet":
+        return "7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110"
+    if network == "testnet":
+        key = os.getenv("WALLET_PRIVATE_KEY_TESTNET")
+        assert key, "WALLET_PRIVATE_KEY_TESTNET not found in environment variables"
+        return key
+    raise NotImplementedError(f"Network {network} not yet supported")
 
 def get_contract_address(network, contract_name):
     with open("./deploy/vars.json", "r") as f:

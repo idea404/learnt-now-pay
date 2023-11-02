@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { ethers } from "ethers";
 
 const JSON_FILE_PATH = path.join(__dirname, "vars.json");
 
@@ -47,6 +48,18 @@ export function getUserPrivateKey(network: string): string {
   }
 
   return privateKey;
+}
+
+export function getPublicKey(network: string): string {
+  const privateKey = getPrivateKey(network);
+  const wallet = new ethers.Wallet(privateKey);
+  return wallet.address;
+}
+
+export function getUserPublicKey(network: string): string {
+  const privateKey = getUserPrivateKey(network);
+  const wallet = new ethers.Wallet(privateKey);
+  return wallet.address;
 }
 
 export function getL2RpcUrl(network: string): string {

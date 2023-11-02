@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 import { Provider, Wallet } from 'zksync-web3';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { getDeployedContractDetailsFromVars, getL2RpcUrl, getPrivateKey } from '../deploy/utils';
+import { getDeployedContractDetailsFromVars, getL2RpcUrl, getPrivateKey, getUserPublicKey } from '../deploy/utils';
 
 dotenv.config();
 
@@ -18,7 +18,7 @@ const PRIVATE_KEY = getPrivateKey(NETWORK); // Replace with private key
 const POAP_NFT_CONTRACT_ADDRESS = getDeployedContractDetailsFromVars(NETWORK, 'PoapNFT').address; // Replace with POAP NFT contract address
 const PAYOUT_CONTRACT_ADDRESS = getDeployedContractDetailsFromVars(NETWORK, 'Payout').address; // Replace with Payout contract address
 const ETH_SEND_TO_PAYOUT = '0.1'; // Replace with the amount of ETH to send to the user
-export const NFT_RECIPIENT_ADDRESS = '0x940755F8968253Cd9F436cAd780241d377BcfD11'; // Replace with the address that will receive the NFT // testnet
+export const NFT_RECIPIENT_ADDRESS = getUserPublicKey(NETWORK); // Replace with the address that will receive the NFT // testnet
 export const TUTORIAL_CATEGORY = 'PoapMultiplier'; // Replace with the category name
 export let USER_NFT_ID = 2; // Replace with the NFT ID assigned to the user
 

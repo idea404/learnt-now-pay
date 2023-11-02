@@ -11,7 +11,7 @@ from eth_account import Account
 from eth_account.signers.local import LocalAccount
 from structlog import get_logger
 from tests import test_submission
-from utils import Status, Submission, get_private_key
+from utils import Status, Submission, get_private_key, get_l2_rpc_url
 from zksync2.module.module_builder import ZkSyncBuilder
 
 log = get_logger(__name__)
@@ -21,12 +21,13 @@ class SubmissionsTester:
       self, 
       submissions_manager_contract: str, 
       payout_contract_address: str, 
-      l2_rpc_url: str = "https://zksync2-testnet.zksync.dev"
+      network: str = "test"
   ) -> None:
-    log.info(f"Initializing SubmissionsManager with submissions manager contract {submissions_manager_contract} and payout contract address {payout_contract_address} on {l2_rpc_url}...")
+    log.info(f"Initializing SubmissionsManager with submissions manager contract {submissions_manager_contract} and payout contract address {payout_contract_address} on {network}...")
     self._dir = pathlib.Path(__file__).parent.resolve()
 
-    private_key = get_private_key(l2_rpc_url)
+    l2_rpc_url = get_l2_rpc_url(network)
+    private_key = get_private_key(network)
     self.account: LocalAccount = Account.from_key(private_key)
     self.zkweb3 = ZkSyncBuilder.build(l2_rpc_url)
     self.submissions_contract_json_path = self._dir.parent.parent / "artifacts-zk" / "contracts" / "TutorialSubmission.sol" / "TutorialSubmission.json"

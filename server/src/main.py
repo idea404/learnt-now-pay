@@ -12,6 +12,6 @@ if __name__ == "__main__":
     manager = SubmissionsTester(
         submissions_manager_contract=get_contract_address(network, "TutorialSubmission"),
         payout_contract_address=get_contract_address(network, "Payout"),
-        l2_rpc_url=rpc_url
+        network=network
     )
     manager.run()
