@@ -22,7 +22,7 @@
     "zksync-web3": "^0.14.3"
   },
   "scripts": {
-    "node:start": "npx zksync-cli dev start",
+    "node:start": "echo 'y' | npx zksync-cli dev start",
     "node:end": "npx zksync-cli dev stop",
     "test": "trap 'npm run node:end' EXIT; npm run node:start && NODE_ENV=test hardhat test --network zkSyncNetwork",
     "compile": "hardhat compile",
