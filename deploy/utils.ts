@@ -7,10 +7,10 @@ export function getPrivateKey(network: string): string {
   let privateKey: string | undefined;
 
   if (network == "test") {
-    privateKey = process.env.WALLET_PRIVATE_KEY_TEST;
+    privateKey = "7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110";
   }
   if (network == "localnet") {
-    privateKey = process.env.WALLET_PRIVATE_KEY_LOCALNET;
+    privateKey = "7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110";
   }
   if (network == "testnet") {
     privateKey = process.env.WALLET_PRIVATE_KEY_TESTNET;
@@ -30,10 +30,10 @@ export function getUserPrivateKey(network: string): string {
   let privateKey: string | undefined;
 
   if (network == "test") {
-    privateKey = process.env.USER_PRIVATE_KEY_TEST;
+    privateKey = "0xac1e735be8536c6534bb4f17f06f6afc73b2b5ba84ac2cfb12f7461b20c0bbe3";
   }
   if (network == "localnet") {
-    privateKey = process.env.USER_PRIVATE_KEY_LOCALNET;
+    privateKey = "0xac1e735be8536c6534bb4f17f06f6afc73b2b5ba84ac2cfb12f7461b20c0bbe3";
   }
   if (network == "testnet") {
     privateKey = process.env.USER_PRIVATE_KEY_TESTNET;
@@ -53,16 +53,16 @@ export function getL2RpcUrl(network: string): string {
   let rpcUrl: string | undefined;
 
   if (network == "test") {
-    rpcUrl = process.env.L2_RPC_URL_TEST;
+    rpcUrl = "http://127.0.0.1:8011";
   }
   if (network == "localnet") {
-    rpcUrl = process.env.L2_RPC_URL_LOCALNET;
+    rpcUrl = "http://127.0.0.1:3050";
   }
   if (network == "testnet") {
-    rpcUrl = process.env.L2_RPC_URL_TESTNET;
+    rpcUrl = "https://zksync2-testnet.zksync.dev";
   }
   if (network == "mainnet") {
-    rpcUrl = process.env.L2_RPC_URL_MAINNET;
+    throw "⛔️ Mainnet not supported!";
   }
 
   if (!rpcUrl) {
